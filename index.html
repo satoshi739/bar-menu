@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プレミアムメニューシステム - 完成版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Sans', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        /* ヘッダー */
+        .header {
+            background: rgba(0,0,0,0.5);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid #ffd700;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #ffd700;
+            letter-spacing: 2px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .lang-select {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 1px solid #ffd700;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* タブナビゲーション */
+        .tab-nav {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            gap: 10px;
+        }
+        
+        .tab-btn {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 2px solid rgba(255,215,0,0.3);
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(135deg, #ffd700, #f39c12);
+            color: #1a1a2e;
+            border-color: #ffd700;
+            transform: scale(1.05);
+        }
+        
+        /* コンテンツ */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 1em;
+            color: #aaa;
+            margin-bottom: 40px;
+        }
+        
+        /* システムセクション */
+        .system-section {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.3);
+        }
+        
+        .system-section h2 {
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            text-align: center;
+            border-bottom: 3px solid rgba(255,255,255,0.3);
+            padding-bottom: 15px;
+        }
+        
+        .system-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .system-item {
+            background: rgba(255,255,255,0.1);
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .system-item:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .system-item .label {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .system-item .price {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        /* ボトルセクション */
+        .bottle-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .bottle-section h2 {
+            font-size: 2em;
+            margin-bottom: 25px;
+            color: #ffd700;
+            border-left: 5px solid #ffd700;
+            padding-left: 15px;
+        }
+        
+        .category {
+            margin-bottom: 35px;
+        }
+        
+        .category h3 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #f39c12;
+            border-bottom: 2px solid rgba(243, 156, 18, 0.3);
+            padding-bottom: 10px;
+        }
+        
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        
+        .menu-item {
+            background: rgba(255,255,255,0.08);
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .menu-item:hover {
+            background: rgba(255,255,255,0.12);
+            transform: translateX(5px);
+        }
+        
+        .menu-item .name {
+            font-size: 1.1em;
+            color: #ecf0f1;
+            flex: 1;
+        }
+        
+        .menu-item .price {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #ffd700;
+            margin-left: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .currency {
+            font-size: 0.7em;
+            color: #bdc3c7;
+            margin-left: 5px;
+        }
+        
+        /* モーダル */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .password-content {
+            background: linear-gradient(135deg, #2c3e50, #1a252f);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            border: 2px solid #ffd700;
+        }
+        
+        .password-content h2 {
+            color: #ffd700;
+            margin-bottom: 30px;
+        }
+        
+        .password-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.5em;
+            text-align: center;
+            border: 2px solid #ffd700;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            margin-bottom: 20px;
+            letter-spacing: 10px;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #2c3e50, #1a252f);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 1000px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 2px solid #ffd700;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #ffd700;
+            padding-bottom: 20px;
+        }
+        
+        .modal-header h2 {
+            color: #ffd700;
+            font-size: 2em;
+        }
+        
+        .close-btn {
+            background: #e74c3c;
+            color: #fff;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+        
+        .settings-section {
+            margin-bottom: 40px;
+        }
+        
+        .settings-section h3 {
+            color: #f39c12;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            border-left: 4px solid #f39c12;
+            padding-left: 15px;
+        }
+        
+        .form-group {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 150px 1fr auto;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .form-row label {
+            color: #ecf0f1;
+        }
+        
+        .form-row input {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid #ffd700;
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .delete-btn {
+            background: #e74c3c;
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .add-btn {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        
+        .save-btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: #fff;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.2em;
+            width: 100%;
+            margin-top: 30px;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .header { flex-direction: column; gap: 10px; }
+            .tab-nav { flex-direction: column; }
+            .tab-btn { width: 100%; }
+            .menu-grid, .system-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- パスワードモーダル -->
+    <div id="passwordModal" class="modal">
+        <div class="password-content">
+            <h2>🔐 管理者認証</h2>
+            <p style="color: #aaa; margin-bottom: 20px;">パスワードを入力してください</p>
+            <input type="password" class="password-input" id="passwordInput" maxlength="4" placeholder="••••">
+            <div style="display: flex; gap: 10px;">
+                <button class="btn" onclick="closePasswordModal()" style="flex: 1;">キャンセル</button>
+                <button class="btn" onclick="checkPassword()" style="flex: 1; background: linear-gradient(135deg, #3498db, #2980b9);">確認</button>
+            </div>
+            <p id="passwordError" style="color: #e74c3c; margin-top: 15px; display: none;">パスワードが違います</p>
+        </div>
+    </div>
+    
+    <!-- ヘッダー -->
+    <div class="header">
+        <div class="logo">🥂 PREMIUM MENU</div>
+        <div class="controls">
+            <select class="lang-select" id="langSelect">
+                <option value="ja">🇯🇵 日本語</option>
+                <option value="en">🇬🇧 English</option>
+                <option value="th">🇹🇭 ไทย</option>
+                <option value="zh">🇨🇳 中文</option>
+                <option value="ko">🇰🇷 한국어</option>
+            </select>
+            <button class="btn" onclick="showPasswordModal()">⚙️ 設定</button>
+        </div>
+    </div>
+    
+    <!-- タブナビゲーション -->
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('system')">システムメニュー</button>
+        <button class="tab-btn" onclick="switchTab('bottle')">ボトルメニュー</button>
+    </div>
+    
+    <!-- コンテンツ -->
+    <div class="container">
+        <!-- システムメニュー -->
+        <div id="systemTab" class="tab-content active">
+            <div class="system-section">
+                <h2>💎 システム料金</h2>
+                <div class="system-grid" id="systemGrid"></div>
+            </div>
+        </div>
+        
+        <!-- ボトルメニュー -->
+        <div id="bottleTab" class="tab-content">
+            <h1>🍾 BOTTLE MENU 🍾</h1>
+            <p class="subtitle">Premium Selection</p>
+            <div id="bottleContent"></div>
+        </div>
+    </div>
+    
+    <!-- 設定モーダル -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚙️ 管理設定</h2>
+                <button class="close-btn" onclick="closeSettings()">×</button>
+            </div>
+            <div id="settingsContent"></div>
+            <button class="save-btn" onclick="saveSettings()">💾 保存してメニューを更新</button>
+        </div>
+    </div>
+    
+    <script>
+        console.log('メニューシステム起動');
+        
+        // 翻訳データ
+        const translations = {
+            ja: { champagne: 'シャンパン', whisky: 'ウイスキー', shochu: '焼酎' },
+            en: { champagne: 'Champagne', whisky: 'Whisky', shochu: 'Shochu' },
+            th: { champagne: 'แชมเปญ', whisky: 'วิสกี้', shochu: 'โชจู' },
+            zh: { champagne: '香槟', whisky: '威士忌', shochu: '烧酒' },
+            ko: { champagne: '샴페인', whisky: '위스키', shochu: '소주' }
+        };
+        
+        // メニューデータ
+        let menuData = {
+            password: '0000',
+            system: {
+                '1時間': { price: 700, en: '1 Hour', th: '1 ชั่วโมง', zh: '1小时', ko: '1시간' },
+                '延長（1時間）': { price: 700, en: 'Extension', th: 'ต่อเวลา', zh: '延长', ko: '연장' },
+                '女の子ドリンク': { price: 200, en: 'Lady Drink', th: 'เครื่องดื่มสาว', zh: '女孩饮料', ko: '레이디 드링크' },
+                '女の子テキーラ': { price: 300, en: 'Lady Tequila', th: 'เทคิลาสาว', zh: '女孩龙舌兰', ko: '레이디 데킬라' }
+            },
+            bottles: {
+                champagne: {
+                    'エントリー': [
+                        { name: { ja: 'カフェ・ド・パリ', en: 'Cafe de Paris', th: 'คาเฟ่ เดอ ปารีส', zh: '巴黎咖啡馆', ko: '카페 드 파리' }, price: 3200 },
+                        { name: { ja: 'シャンドン ブリュット', en: 'Chandon Brut', th: 'ชองดง บรูท', zh: '香桐起泡酒', ko: '샹동 브뤼' }, price: 3500 },
+                        { name: { ja: 'シャンドン ロゼ', en: 'Chandon Rosé', th: 'ชองดง โรเซ่', zh: '香桐桃红', ko: '샹동 로제' }, price: 3800 }
+                    ],
+                    'ミドル': [
+                        { name: { ja: 'モエ・エ・シャンドン ブリュット', en: 'Moët Brut', th: 'โมเอ็ท บรูท', zh: '酩悦香槟', ko: '모엣 브뤼' }, price: 7500 },
+                        { name: { ja: 'モエ・エ・シャンドン ロゼ', en: 'Moët Rosé', th: 'โมเอ็ท โรเซ่', zh: '酩悦桃红', ko: '모엣 로제' }, price: 9500 },
+                        { name: { ja: 'ヴーヴ・クリコ', en: 'Veuve Clicquot', th: 'เวิฟ คลิโก้', zh: '凯歌香槟', ko: '뵈브 클리코' }, price: 8500 }
+                    ],
+                    'ハイエンド': [
+                        { name: { ja: 'モエ ネクター', en: 'Moët Nectar', th: 'โมเอ็ท เนคตาร์', zh: '酩悦花蜜', ko: '모엣 넥타' }, price: 11000 },
+                        { name: { ja: 'ドンペリニヨン', en: 'Dom Pérignon', th: 'ดอม เปริญอง', zh: '唐培里侬', ko: '돔 페리뇽' }, price: 19000 },
+                        { name: { ja: 'ドンペリ ロゼ', en: 'Dom Pérignon Rosé', th: 'ดอม เปริญอง โรเซ่', zh: '唐培里侬桃红', ko: '돔 페리뇽 로제' }, price: 38000 }
+                    ],
+                    'プレミアム': [
+                        { name: { ja: 'アルマンド ゴールド', en: 'Armand Gold', th: 'อาร์มานด์ ทอง', zh: '黑桃A金', ko: '아르망 골드' }, price: 39000 },
+                        { name: { ja: 'アルマンド ロゼ', en: 'Armand Rosé', th: 'อาร์มานด์ โรเซ่', zh: '黑桃A桃红', ko: '아르망 로제' }, price: 65000 },
+                        { name: { ja: 'アルマンド カラー', en: 'Armand Color', th: 'อาร์มานด์ สี', zh: '黑桃A彩色', ko: '아르망 컬러' }, price: 85000 },
+                        { name: { ja: 'クリスタル ブリュット', en: 'Cristal Brut', th: 'คริสตัล บรูท', zh: '水晶香槟', ko: '크리스탈 브뤼' }, price: 38000 },
+                        { name: { ja: 'クリスタル ロゼ', en: 'Cristal Rosé', th: 'คริสตัล โรเซ่', zh: '水晶桃红', ko: '크리스탈 로제' }, price: 75000 }
+                    ]
+                },
+                whisky: {
+                    'スタンダード': [
+                        { name: { ja: '角瓶', en: 'Kakubin', th: 'คะคุบิน', zh: '角瓶', ko: '가쿠빈' }, price: 3500 },
+                        { name: { ja: 'フォアローゼス', en: 'Four Roses', th: 'โฟร์โรสเซส', zh: '四玫瑰', ko: '포 로지스' }, price: 3500 },
+                        { name: { ja: 'シーバスリーガル 12年', en: 'Chivas 12Y', th: 'ชีวาส 12 ปี', zh: '芝华士12年', ko: '시바스 12년' }, price: 3800 }
+                    ],
+                    'プレミアム': [
+                        { name: { ja: 'マッカラン 12年', en: 'Macallan 12Y', th: 'แมคคาแลน 12 ปี', zh: '麦卡伦12年', ko: '맥캘란 12년' }, price: 8500 },
+                        { name: { ja: 'ヤマザキ 12年', en: 'Yamazaki 12Y', th: 'ยามาซากิ 12 ปี', zh: '山崎12年', ko: '야마자키 12년' }, price: 'ASK' },
+                        { name: { ja: '白州 12年', en: 'Hakushu 12Y', th: 'ฮะคุชู 12 ปี', zh: '白州12年', ko: '하쿠슈 12년' }, price: 'ASK' }
+                    ]
+                },
+                shochu: [
+                    { name: { ja: 'いいちこ', en: 'Iichiko', th: 'อิอิชิโกะ', zh: '好一好', ko: '이이치코' }, price: 2800 },
+                    { name: { ja: '黒霧島', en: 'Kuro Kirishima', th: 'คุโระ คิริชิมะ', zh: '黑雾岛', ko: '쿠로 키리시마' }, price: 3200 },
+                    { name: { ja: '二階堂', en: 'Nikaido', th: 'นิไคโด', zh: '二阶堂', ko: '니카이도' }, price: 3200 }
+                ]
+            }
+        };
+        
+        // ローカルストレージ
+        function loadData() {
+            const saved = localStorage.getItem('menuDataFinal');
+            if (saved) {
+                try {
+                    menuData = JSON.parse(saved);
+                    console.log('データ読み込み成功');
+                } catch (e) {
+                    console.error('データ読み込みエラー:', e);
+                }
+            }
+        }
+        
+        function saveData() {
+            localStorage.setItem('menuDataFinal', JSON.stringify(menuData));
+            console.log('データ保存完了');
+        }
+        
+        // 初期化
+        loadData();
+        
+        // タブ切り替え
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            if (tab === 'system') {
+                document.getElementById('systemTab').classList.add('active');
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            } else {
+                document.getElementById('bottleTab').classList.add('active');
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            }
+        }
+        
+        // システムメニュー表示
+        function renderSystemMenu() {
+            const grid = document.getElementById('systemGrid');
+            const lang = document.getElementById('langSelect').value;
+            let html = '';
+            
+            for (const [key, value] of Object.entries(menuData.system)) {
+                const name = value[lang] || key;
+                const price = typeof value.price === 'number' ? value.price.toLocaleString() : value.price;
+                html += `
+                    <div class="system-item">
+                        <div class="label">${name}</div>
+                        <div class="price">${price}<span class="currency">THB</span></div>
+                    </div>
+                `;
+            }
+            
+            grid.innerHTML = html;
+            console.log('システムメニュー表示完了');
+        }
+        
+        // ボトルメニュー表示
+        function renderBottleMenu() {
+            const content = document.getElementById('bottleContent');
+            const lang = document.getElementById('langSelect').value;
+            let html = '';
+            
+            // シャンパン
+            html += '<div class="bottle-section"><h2>🍾 ' + translations[lang].champagne.toUpperCase() + '</h2>';
+            for (const [category, items] of Object.entries(menuData.bottles.champagne)) {
+                html += `<div class="category"><h3>${category}</h3><div class="menu-grid">`;
+                items.forEach(item => {
+                    const name = item.name[lang] || item.name.ja;
+                    const price = typeof item.price === 'number' ? item.price.toLocaleString() : item.price;
+                    html += `
+                        <div class="menu-item">
+                            <div class="name">${name}</div>
+                            <div class="price">${price}<span class="currency">THB</span></div>
+                        </div>
+                    `;
+                });
+                html += '</div></div>';
+            }
+            html += '</div>';
+            
+            // ウイスキー
+            html += '<div class="bottle-section"><h2>🥃 ' + translations[lang].whisky.toUpperCase() + '</h2>';
+            for (const [category, items] of Object.entries(menuData.bottles.whisky)) {
+                html += `<div class="category"><h3>${category}</h3><div class="menu-grid">`;
+                items.forEach(item => {
+                    const name = item.name[lang] || item.name.ja;
+                    const price = typeof item.price === 'number' ? item.price.toLocaleString() : item.price;
+                    const currency = item.price === 'ASK' ? '' : '<span class="currency">THB</span>';
+                    html += `
+                        <div class="menu-item">
+                            <div class="name">${name}</div>
+                            <div class="price">${price}${currency}</div>
+                        </div>
+                    `;
+                });
+                html += '</div></div>';
+            }
+            html += '</div>';
+            
+            // 焼酎
+            html += '<div class="bottle-section"><h2>🍶 ' + translations[lang].shochu + '</h2><div class="menu-grid">';
+            menuData.bottles.shochu.forEach(item => {
+                const name = item.name[lang] || item.name.ja;
+                const price = typeof item.price === 'number' ? item.price.toLocaleString() : item.price;
+                html += `
+                    <div class="menu-item">
+                        <div class="name">${name}</div>
+                        <div class="price">${price}<span class="currency">THB</span></div>
+                    </div>
+                `;
+            });
+            html += '</div></div>';
+            
+            content.innerHTML = html;
+            console.log('ボトルメニュー表示完了');
+        }
+        
+        // 言語切り替え
+        document.getElementById('langSelect').addEventListener('change', function() {
+            renderSystemMenu();
+            renderBottleMenu();
+            console.log('言語切り替え:', this.value);
+        });
+        
+        // パスワードモーダル
+        function showPasswordModal() {
+            document.getElementById('passwordModal').classList.add('active');
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('passwordError').style.display = 'none';
+        }
+        
+        function closePasswordModal() {
+            document.getElementById('passwordModal').classList.remove('active');
+        }
+        
+        function checkPassword() {
+            const input = document.getElementById('passwordInput').value;
+            if (input === menuData.password) {
+                closePasswordModal();
+                openSettings();
+            } else {
+                document.getElementById('passwordError').style.display = 'block';
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+        
+        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') checkPassword();
+        });
+        
+        // 設定モーダル
+        function openSettings() {
+            document.getElementById('settingsModal').classList.add('active');
+            renderSettings();
+        }
+        
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.remove('active');
+        }
+        
+        function renderSettings() {
+            const content = document.getElementById('settingsContent');
+            let html = '';
+            
+            // システム設定
+            html += '<div class="settings-section"><h3>💎 システム料金設定</h3>';
+            for (const [key, value] of Object.entries(menuData.system)) {
+                html += `
+                    <div class="form-group" data-system-key="${key}">
+                        <div class="form-row">
+                            <label>商品名(日)</label>
+                            <input type="text" value="${key}" data-field="name">
+                            <button class="delete-btn" onclick="deleteSystem('${key}')">削除</button>
+                        </div>
+                        <div class="form-row">
+                            <label>価格(THB)</label>
+                            <input type="number" value="${value.price}" data-field="price">
+                        </div>
+                        <div class="form-row">
+                            <label>English</label>
+                            <input type="text" value="${value.en}" data-field="en">
+                        </div>
+                        <div class="form-row">
+                            <label>ไทย</label>
+                            <input type="text" value="${value.th}" data-field="th">
+                        </div>
+                        <div class="form-row">
+                            <label>中文</label>
+                            <input type="text" value="${value.zh}" data-field="zh">
+                        </div>
+                        <div class="form-row">
+                            <label>한국어</label>
+                            <input type="text" value="${value.ko}" data-field="ko">
+                        </div>
+                    </div>
+                `;
+            }
+            html += '<button class="add-btn" onclick="addSystem()">➕ システム項目を追加</button></div>';
+            
+            // ボトル価格設定
+            html += '<div class="settings-section"><h3>🍾 ボトルメニュー価格設定</h3>';
+            
+            // シャンパン
+            html += '<h4 style="color: #f39c12;">シャンパン</h4>';
+            for (const [cat, items] of Object.entries(menuData.bottles.champagne)) {
+                html += `<p style="color: #ffd700; margin: 10px 0;">${cat}</p>`;
+                items.forEach((item, idx) => {
+                    html += `
+                        <div class="form-group">
+                            <div class="form-row">
+                                <label>${item.name.ja}</label>
+                                <input type="number" value="${item.price}" data-bottle="champagne" data-cat="${cat}" data-idx="${idx}">
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            // ウイスキー
+            html += '<h4 style="color: #f39c12; margin-top: 20px;">ウイスキー</h4>';
+            for (const [cat, items] of Object.entries(menuData.bottles.whisky)) {
+                html += `<p style="color: #ffd700; margin: 10px 0;">${cat}</p>`;
+                items.forEach((item, idx) => {
+                    html += `
+                        <div class="form-group">
+                            <div class="form-row">
+                                <label>${item.name.ja}</label>
+                                <input type="text" value="${item.price}" data-bottle="whisky" data-cat="${cat}" data-idx="${idx}">
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            // 焼酎
+            html += '<h4 style="color: #f39c12; margin-top: 20px;">焼酎</h4>';
+            menuData.bottles.shochu.forEach((item, idx) => {
+                html += `
+                    <div class="form-group">
+                        <div class="form-row">
+                            <label>${item.name.ja}</label>
+                            <input type="number" value="${item.price}" data-bottle="shochu" data-idx="${idx}">
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            content.innerHTML = html;
+        }
+        
+        function deleteSystem(key) {
+            if (confirm('削除しますか？')) {
+                delete menuData.system[key];
+                renderSettings();
+            }
+        }
+        
+        function addSystem() {
+            const name = prompt('商品名を入力:');
+            if (name) {
+                menuData.system[name] = { price: 0, en: name, th: name, zh: name, ko: name };
+                renderSettings();
+            }
+        }
+        
+        function saveSettings() {
+            // システム保存
+            document.querySelectorAll('[data-system-key]').forEach(group => {
+                const oldKey = group.getAttribute('data-system-key');
+                const inputs = group.querySelectorAll('[data-field]');
+                let newKey = oldKey;
+                
+                inputs.forEach(input => {
+                    const field = input.getAttribute('data-field');
+                    if (field === 'name') {
+                        newKey = input.value;
+                    } else if (field === 'price') {
+                        menuData.system[oldKey].price = parseFloat(input.value) || 0;
+                    } else {
+                        menuData.system[oldKey][field] = input.value;
+                    }
+                });
+                
+                if (newKey !== oldKey) {
+                    menuData.system[newKey] = menuData.system[oldKey];
+                    delete menuData.system[oldKey];
+                }
+            });
+            
+            // ボトル価格保存
+            document.querySelectorAll('[data-bottle]').forEach(input => {
+                const type = input.getAttribute('data-bottle');
+                const cat = input.getAttribute('data-cat');
+                const idx = parseInt(input.getAttribute('data-idx'));
+                
+                if (cat) {
+                    const val = input.value;
+                    menuData.bottles[type][cat][idx].price = val === 'ASK' ? 'ASK' : (parseFloat(val) || 0);
+                } else {
+                    menuData.bottles[type][idx].price = parseFloat(input.value) || 0;
+                }
+            });
+            
+            saveData();
+            renderSystemMenu();
+            renderBottleMenu();
+            closeSettings();
+            alert('✅ 保存しました！');
+        }
+        
+        // 初期表示
+        renderSystemMenu();
+        renderBottleMenu();
+        console.log('初期化完了');
+    </script>
+</body>
+</html>
